@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Make your ToDo list. Do not forget anything again">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo</title>
+    <link rel="shortcut icon" href="./Images/check.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="main.js" defer></script>
+</head>
+
+<body>
+    <template id="list-item">
+        <li class="input-item">
+            <input id="" class="checkbox" type="checkbox">
+            <label class="todo-facade" for=""></label>
+            <button class="delete">❌</button>
+        </li>
+    </template>
+
+    <header>
+        <h1>todos</h1>
+    </header>
+    <main>
+        <form autocomplete="off">
+            <div class="todo-top">
+                <label id="toggle-btn"><img id="toggle-img" src="./Images/toggle.png"
+                        alt="Toggle pointer for todo list items"></label>
+                <input id="text-input" name="input" class="todo-facade" type="text" placeholder="What needs to be done?"
+                    autofocus>
+            </div>
+        </form>
+        <ul id="todo-list">
+            <!-- Templates inserts here. -->
+        </ul>
+        <footer class="todo-status">
+            <span class="item-count">
+                
+            </span>
+            <ul class="filters">
+                <li>
+                    <a id="all-btn" class="link-hover" href="">All</a>
+                </li>
+                <li>
+                    <a id="active-btn" class="link-hover" href="">Active</a>
+                </li>
+                <li>
+                    <a id="completed-btn"class="link-hover" href="">Completed</a>
+                </li>
+            </ul>
+            <button class="clear-completed">Clear completed</button>
+        </footer>
+    </main>
+    <footer class="info">
+        <p>Double-click to edit a todo</p>
+        <p>Written by Patrik & Ola</p>
+        <p>Part of <a href="https://todomvc.com/">TodoMVC</a></p>
+    </footer>
+</body>
+
+</html>
