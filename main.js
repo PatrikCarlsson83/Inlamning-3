@@ -10,9 +10,9 @@ const clearCompleted = document.querySelector('.clear-completed');
 const allBtn = document.querySelector('#all-btn');
 const activeBtn = document.querySelector('#active-btn');
 const completedBtn = document.querySelector('#completed-btn');
-
-
-
+let allButton = true;
+let activeButton = false;
+let completedButton = false;
 
 let todos = [];
 //Counter for adding ID's to the new templates so the css rule will work on checkbox???? ändra???
@@ -81,6 +81,13 @@ toggleBtn.addEventListener('click', e => {
 
 list.addEventListener('click', e => {
 
+    if (allButton)
+        allBtn.click();
+    if (activeButton)
+        activeBtn.click();
+    if (completedButton)
+        completedBtn.click();
+
     itemCount();
 
 });
@@ -111,33 +118,44 @@ clearCompleted.addEventListener('click', e => {
 
 allBtn.onclick = (e => {
     e.preventDefault();
+    allButton = true;
+    activeButton = false;
+    completedButton = false;
+
     allBtn.setAttribute('class', 'link-border');
+    removeBorder(activeBtn, completedBtn);
 
     todos.forEach(e => {
-        e.style.display = "inline-block";
+        e.style.display = 'inline-block';
     })
-
-    btnBorder(activeBtn, completedBtn);
 })
+
+
 
 activeBtn.onclick = (e => {
     e.preventDefault();
+    allButton = false;
+    activeButton = true;
+    completedButton = false;
+
     activeBtn.setAttribute('class', 'link-border');
-
-
-    btnBorder(allBtn, completedBtn);
-
+    removeBorder(allBtn, completedBtn);
     todosChecked(true);
+
+    itemCount();
 
 })
 
 completedBtn.onclick = (e => {
     e.preventDefault();
+    allButton = false;
+    activeButton = false;
+    completedButton = true;
+
     completedBtn.setAttribute('class', 'link-border');
-
-    btnBorder(allBtn, activeBtn);
-
+    removeBorder(activeBtn, allBtn);
     todosChecked(false);
+
 })
 
 function itemCount() {
@@ -158,21 +176,18 @@ function itemCount() {
         }
     })
 
+    
+    if (itemCounter === 0 && todos.length > 0)
+    toggleImg.style.opacity = '60%';
+    else {
+        toggleImg.style.opacity = '10%';
+    }
     // Hide clear button
     if (itemCounter !== todos.length) {
         clearCompleted.style.visibility = 'visible';
-    }
-    else {
+    } else {
         clearCompleted.style.visibility = 'hidden';
     }
-
-    if (itemCounter === 0 && todos.length > 0)
-        toggleImg.style.opacity = '60%';
-    else {
-        toggleImg.style.opacity = '10%';
-        
-    }
-
 }
 
 function todosChecked(bool) {
@@ -187,7 +202,7 @@ function todosChecked(bool) {
     })
 }
 
-function btnBorder(a, b) {
+function removeBorder(a, b) {
     a.removeAttribute('class', 'link-border');
     b.removeAttribute('class', 'link-border');
 }

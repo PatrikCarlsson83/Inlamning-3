@@ -140,11 +140,18 @@ h1 {
     justify-self: left;
 }
 
+#all-btn,
+#active-btn,
+#completed-btn {
+    padding: .188rem .438rem;
+}
+
 .filters {
     grid-area: b;
     display: flex;
     justify-content: space-evenly;
     list-style: none;
+    text-align: center;
 }
 
 .clear-completed {
@@ -161,7 +168,6 @@ h1 {
 }
 
 .link-border {
-    padding: .188rem .438rem;
     border-radius: .188rem;
     border: .063rem solid rgba(175, 47, 47, 0.2);
 }
@@ -239,7 +245,7 @@ h1 {
         width: 100%;
     }
 
-    }
+}
 
 @media screen and (max-width:33rem) {
 
@@ -260,5 +266,5 @@ h1 {
     }
 
 
-    /*fixa position på checkbox och padding på link?*/
+    /*fixa position på checkbox och toggle-img och padding på link?*/
 }
