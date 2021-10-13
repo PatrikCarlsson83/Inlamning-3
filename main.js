@@ -1,3 +1,142 @@
+//Helper functions
+//Count Todos and change footer menue gui
+function itemCount() {
+    let itemCounter = 0;
+
+    todos.forEach(e => {
+        let id = e.firstElementChild;
+        let items = document.querySelector('.item-count');
+
+        if (!id.checked) {
+            itemCounter++;
+        }
+
+        if (itemCounter === 1) {
+            items.innerText = itemCounter + ' item left';
+        } else {
+            items.innerText = itemCounter + ' items left';
+        }
+    });
+
+
+    if (itemCounter === 0 && todos.length > 0)
+        toggleImg.style.opacity = '60%';
+    else {
+        toggleImg.style.opacity = '10%';
+    }
+    // Hide clear button
+    if (itemCounter !== todos.length) {
+        clearCompleted.style.visibility = 'visible';
+    } else {
+        clearCompleted.style.visibility = 'hidden';
+    }
+}
+
+//Hide or show Todos
+function todosChecked(bool) {
+    let active = todos.filter(a => a.firstElementChild.checked === bool);
+
+    todos.forEach(e => {
+        e.style.display = "inline-block";
+    });
+
+    active.forEach(e => {
+        e.style.display = "none";
+    });
+}
+
+function removeBorder(a, b) {
+    a.removeAttribute('class', 'link-border');
+    b.removeAttribute('class', 'link-border');
+}
+
+function updateFilters() {
+    if (allButton)
+        allBtn.click();
+    if (activeButton)
+        activeBtn.click();
+    if (completedButton)
+        completedBtn.click();
+}
+
+function addItem(text, bool) {
+    idCounter++;
+    const listItem = listItemTemplate.content.firstElementChild.cloneNode(true);
+    const deleteBtn = listItem.querySelector('button');
+    const item = listItem.querySelector('.item');
+
+    listItem.querySelector('input').id = idCounter;
+    listItem.querySelector('label').id = idCounter + 'l';
+    const label = listItem.querySelector('label');
+    label.setAttribute('for', idCounter);
+    item.innerText = text;
+
+    listItem.querySelector('.checkbox').checked = bool;
+
+    todos.push(listItem);
+
+    list.append(listItem);
+    todoStatus.style.display = "grid";
+    textInput.value = '';
+    allBtn.setAttribute('class', 'link-border');
+    main.setAttribute('class', 'shadow-boxes');
+
+    itemCount();
+    updateFilters();
+
+    // Adds new todos
+    label.addEventListener("dblclick", e => {
+        e.preventDefault();
+        const text = document.createElement("input");
+        text.type = "text";
+        text.setAttribute("class", "edit-item");
+        label.style.display = "none"; ////////////////////////////////////////////
+        deleteBtn.style.display = "none";
+        text.value = item.innerText;
+        listItem.append(text);
+
+        text.focus();
+
+        // Edit Todos
+        text.addEventListener("blur", e => {
+            text.remove();
+            label.style.display = "inline-block";
+            deleteBtn.style.display = "inline-block";
+        });
+
+        text.addEventListener("keyup", ({
+            key
+        }) => {
+            e.preventDefault();
+
+            if (key === "Enter") {
+                if (text.value !== '') {
+                    item.innerText = text.value;
+                    deleteBtn.style.display = "inline-block";
+                    text.remove();
+                } else {
+                    text.remove();
+                    deleteBtn.style.display = "inline-block";
+                }
+            }
+        });
+    });
+
+    //Delete Todos from GUI and list
+    deleteBtn.onclick = (e => {
+        let index = todos.indexOf(listItem);
+        console.log(index);
+        todos.splice(index, 1);
+        listItem.remove();
+        itemCount();
+        if (todos.length === 0) {
+            todoStatus.style.display = "none";
+            main.removeAttribute('class', 'shadow-boxes');
+        }
+    });
+}
+
+//creating variables to manipulate the DOM
 const form = document.querySelector('form');
 const list = document.getElementById('todo-list');
 const listItemTemplate = document.getElementById('list-item');
@@ -10,51 +149,51 @@ const clearCompleted = document.querySelector('.clear-completed');
 const allBtn = document.querySelector('#all-btn');
 const activeBtn = document.querySelector('#active-btn');
 const completedBtn = document.querySelector('#completed-btn');
+
+//Creating variables to keep track of which "button" is clicked in the 'filters-menue'
 let allButton = true;
 let activeButton = false;
 let completedButton = false;
 
 let todos = [];
-//Counter for adding ID's to the new templates so the css rule will work on checkbox???? ändra???
+let storage = [];
+//Counter for adding ID's to the new templates so the css rules will work.
 let idCounter = 0;
+
+//Event listeners
+
+window.addEventListener('load', e => {
+    var data = localStorage.getItem("items");
+    var storage2 = JSON.parse(data);
+
+    storage2.forEach(e => {
+        addItem(e.text, e.checkbox);
+    });
+});
+
+window.onbeforeunload = function () {
+    todos.forEach(e => {
+        let item = {
+            checkbox: e.children[0].checked,
+            text: e.children[1].innerText
+        };
+        storage.push(item);
+    });
+
+    localStorage.setItem("items", JSON.stringify(storage));
+};
 
 form.onsubmit = (e => {
     e.preventDefault();
     if (textInput.value) {
-        idCounter++;
-        const listItem = listItemTemplate.content.firstElementChild.cloneNode(true);
-        const deleteBtn = listItem.querySelector('button');
+        addItem(textInput.value, false);
 
-        listItem.querySelector('input').id = idCounter;
-        const label = listItem.querySelector('label');
-        label.setAttribute('for', idCounter);
-        label.innerText = textInput.value;
-
-        todos.push(listItem);
-
-        list.append(listItem);
-        todoStatus.style.display = "grid";
-        textInput.value = '';
-        allBtn.setAttribute('class', 'link-border');
-        main.setAttribute('class', 'shadow-boxes');
-
-        itemCount();
-
-        deleteBtn.onclick = (e => {
-            let index = todos.indexOf(listItem);
-            console.log(index);
-            todos.splice(index, 1);
-            listItem.remove();
-            itemCount();
-            if (todos.length === 0) {
-                todoStatus.style.display = "none";
-                main.removeAttribute('class', 'shadow-boxes');
-            }
-        })
     }
-})
+});
 
+// Check or Uncheck Todos
 toggleBtn.addEventListener('click', e => {
+    e.preventDefault();
 
     let length = todos.length;
     let checked = 0;
@@ -67,29 +206,23 @@ toggleBtn.addEventListener('click', e => {
         todos.forEach(e => {
             e.firstElementChild.checked = false;
             toggleImg.style.opacity = '10%';
-        })
+        });
     } else {
         todos.forEach(e => {
             e.firstElementChild.checked = true;
             toggleImg.style.opacity = '60%';
-        })
-    };
+        });
+    }
 
+    updateFilters();
     itemCount();
+});
 
-})
-
+//Update Todo-counter and change Gui in the bottom menue
 list.addEventListener('click', e => {
 
-    if (allButton)
-        allBtn.click();
-    if (activeButton)
-        activeBtn.click();
-    if (completedButton)
-        completedBtn.click();
-
+    updateFilters();
     itemCount();
-
 });
 
 clearCompleted.addEventListener('click', e => {
@@ -101,7 +234,8 @@ clearCompleted.addEventListener('click', e => {
             let index = todos.indexOf(item.parentElement);
             removeList.push(index);
         }
-    })
+    });
+
     //Loop backwards so we dont ruin the order when we remove items
     for (let i = removeList.length - 1; i >= 0; i--) {
         let item = todos[removeList[i]];
@@ -114,23 +248,22 @@ clearCompleted.addEventListener('click', e => {
         main.removeAttribute('class', 'shadow-boxes');
     }
     itemCount();
-})
-
+});
 allBtn.onclick = (e => {
     e.preventDefault();
     allButton = true;
     activeButton = false;
     completedButton = false;
 
+    window.location.hash = 'All';
+
     allBtn.setAttribute('class', 'link-border');
     removeBorder(activeBtn, completedBtn);
 
     todos.forEach(e => {
         e.style.display = 'inline-block';
-    })
-})
-
-
+    });
+});
 
 activeBtn.onclick = (e => {
     e.preventDefault();
@@ -138,13 +271,14 @@ activeBtn.onclick = (e => {
     activeButton = true;
     completedButton = false;
 
+    window.location.hash = 'Active';
+
     activeBtn.setAttribute('class', 'link-border');
     removeBorder(allBtn, completedBtn);
     todosChecked(true);
 
     itemCount();
-
-})
+});
 
 completedBtn.onclick = (e => {
     e.preventDefault();
@@ -152,57 +286,23 @@ completedBtn.onclick = (e => {
     activeButton = false;
     completedButton = true;
 
+    window.location.hash = 'Completed';
+
     completedBtn.setAttribute('class', 'link-border');
     removeBorder(activeBtn, allBtn);
     todosChecked(false);
+});
 
-})
+window.addEventListener('hashchange', e => {
+    let check = window.location.hash;
 
-function itemCount() {
-
-    let itemCounter = 0;
-
-    todos.forEach(e => {
-        let id = e.firstElementChild;
-        if (!id.checked) {
-            itemCounter++;
-        }
-        let items = document.querySelector('.item-count');
-
-        if (itemCounter === 1) {
-            items.innerText = itemCounter + ' item left';
-        } else {
-            items.innerText = itemCounter + ' items left';
-        }
-    })
-
-    
-    if (itemCounter === 0 && todos.length > 0)
-    toggleImg.style.opacity = '60%';
-    else {
-        toggleImg.style.opacity = '10%';
+    if (check === '#All') {
+        allBtn.click();
     }
-    // Hide clear button
-    if (itemCounter !== todos.length) {
-        clearCompleted.style.visibility = 'visible';
-    } else {
-        clearCompleted.style.visibility = 'hidden';
+    if (check === '#Active') {
+        activeBtn.click();
     }
-}
-
-function todosChecked(bool) {
-    let active = todos.filter(a => a.firstElementChild.checked === bool);
-
-    todos.forEach(e => {
-        e.style.display = "inline-block";
-    })
-
-    active.forEach(e => {
-        e.style.display = "none";
-    })
-}
-
-function removeBorder(a, b) {
-    a.removeAttribute('class', 'link-border');
-    b.removeAttribute('class', 'link-border');
-}
+    if (check === '#Completed') {
+        completedBtn.click();
+    }
+});
