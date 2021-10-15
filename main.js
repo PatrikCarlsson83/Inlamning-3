@@ -1,5 +1,5 @@
 //Helper functions
-//Count Todos and change footer menue gui
+//Count Todos and change footer menu gui
 function itemCount() {
     let itemCounter = 0;
 
@@ -17,7 +17,6 @@ function itemCount() {
             items.innerText = itemCounter + ' items left';
         }
     });
-
 
     if (itemCounter === 0 && todos.length > 0)
         toggleImg.style.opacity = '60%';
@@ -46,8 +45,8 @@ function todosChecked(bool) {
 }
 
 function removeBorder(a, b) {
-    a.removeAttribute('class', 'link-border');
-    b.removeAttribute('class', 'link-border');
+    a.classList.remove('link-border');
+    b.classList.remove('link-border');
 }
 
 function updateFilters() {
@@ -59,26 +58,28 @@ function updateFilters() {
         completedBtn.click();
 }
 
-function addItem(text, bool) {
+function changeItemListGUI(text, bool) {
     idCounter++;
     const listItem = listItemTemplate.content.firstElementChild.cloneNode(true);
+    const checkBox = listItem.querySelector('.checkbox');
     const deleteBtn = listItem.querySelector('button');
     const item = listItem.querySelector('.item');
 
     listItem.querySelector('input').id = idCounter;
-    listItem.querySelector('label').id = idCounter + 'l';
     const label = listItem.querySelector('label');
     label.setAttribute('for', idCounter);
     item.innerText = text;
 
-    listItem.querySelector('.checkbox').checked = bool;
+    checkBox.checked = bool;
 
     todos.push(listItem);
 
     list.append(listItem);
+
+    //When item is added show statusbar
     todoStatus.style.display = "grid";
     textInput.value = '';
-    allBtn.setAttribute('class', 'link-border');
+    allBtn.classList.add('link-border');
     main.setAttribute('class', 'shadow-boxes');
 
     itemCount();
@@ -90,7 +91,8 @@ function addItem(text, bool) {
         const text = document.createElement("input");
         text.type = "text";
         text.setAttribute("class", "edit-item");
-        label.style.display = "none"; ////////////////////////////////////////////
+        label.style.display = "none";
+        checkBox.style.display = "none";
         deleteBtn.style.display = "none";
         text.value = item.innerText;
         listItem.append(text);
@@ -102,6 +104,8 @@ function addItem(text, bool) {
             text.remove();
             label.style.display = "inline-block";
             deleteBtn.style.display = "inline-block";
+            checkBox.style.display = "inline-block";
+
         });
 
         text.addEventListener("keyup", ({
@@ -125,7 +129,6 @@ function addItem(text, bool) {
     //Delete Todos from GUI and list
     deleteBtn.onclick = (e => {
         let index = todos.indexOf(listItem);
-        console.log(index);
         todos.splice(index, 1);
         listItem.remove();
         itemCount();
@@ -136,7 +139,7 @@ function addItem(text, bool) {
     });
 }
 
-//creating variables to manipulate the DOM
+//Creating variables to manipulate the DOM
 const form = document.querySelector('form');
 const list = document.getElementById('todo-list');
 const listItemTemplate = document.getElementById('list-item');
@@ -157,17 +160,16 @@ let completedButton = false;
 
 let todos = [];
 let storage = [];
-//Counter for adding ID's to the new templates so the css rules will work.
+//Counter for adding ID's to the new templates so the css rules for checkbox will work.
 let idCounter = 0;
 
 //Event listeners
-
 window.addEventListener('load', e => {
     var data = localStorage.getItem("items");
     var storage2 = JSON.parse(data);
 
     storage2.forEach(e => {
-        addItem(e.text, e.checkbox);
+        changeItemListGUI(e.text, e.checkbox);
     });
 });
 
@@ -186,12 +188,12 @@ window.onbeforeunload = function () {
 form.onsubmit = (e => {
     e.preventDefault();
     if (textInput.value) {
-        addItem(textInput.value, false);
+        changeItemListGUI(textInput.value, false);
 
     }
 });
 
-// Check or Uncheck Todos
+// Check or uncheck Todos
 toggleBtn.addEventListener('click', e => {
     e.preventDefault();
 
@@ -218,9 +220,8 @@ toggleBtn.addEventListener('click', e => {
     itemCount();
 });
 
-//Update Todo-counter and change Gui in the bottom menue
+//Update Todo-counter and change GUI in the bottom menu
 list.addEventListener('click', e => {
-
     updateFilters();
     itemCount();
 });
@@ -243,12 +244,14 @@ clearCompleted.addEventListener('click', e => {
         item.remove();
     }
 
+    //Remove statusbar when there is no items in the list
     if (todos.length === 0) {
         todoStatus.style.display = "none";
         main.removeAttribute('class', 'shadow-boxes');
     }
     itemCount();
 });
+
 allBtn.onclick = (e => {
     e.preventDefault();
     allButton = true;
@@ -257,7 +260,7 @@ allBtn.onclick = (e => {
 
     window.location.hash = 'All';
 
-    allBtn.setAttribute('class', 'link-border');
+    allBtn.classList.add('link-border');
     removeBorder(activeBtn, completedBtn);
 
     todos.forEach(e => {
@@ -273,7 +276,7 @@ activeBtn.onclick = (e => {
 
     window.location.hash = 'Active';
 
-    activeBtn.setAttribute('class', 'link-border');
+    activeBtn.classList.add('link-border');
     removeBorder(allBtn, completedBtn);
     todosChecked(true);
 
@@ -288,7 +291,7 @@ completedBtn.onclick = (e => {
 
     window.location.hash = 'Completed';
 
-    completedBtn.setAttribute('class', 'link-border');
+    completedBtn.classList.add('link-border');
     removeBorder(activeBtn, allBtn);
     todosChecked(false);
 });
