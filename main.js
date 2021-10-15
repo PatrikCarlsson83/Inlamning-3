@@ -49,6 +49,9 @@ function removeBorder(a, b) {
     b.classList.remove('link-border');
 }
 
+
+
+
 function updateFilters() {
     if (allButton)
         allBtn.click();
@@ -100,28 +103,32 @@ function changeItemListGUI(text, bool) {
         text.focus();
 
         // Edit Todos
-        text.addEventListener("blur", e => {
-            text.remove();
+        function checkCheckbox() {
+            if (text.value !== '') {
+                item.innerText = text.value;
+                text.remove();
+            } else {
+                text.remove();
+            }
+        
             label.style.display = "inline-block";
             deleteBtn.style.display = "inline-block";
             checkBox.style.display = "inline-block";
+        }
 
+        //add/edit textbox on blur "unfocus"
+        text.addEventListener("blur", e => {
+            checkCheckbox();
         });
 
+        //Add edited todo
         text.addEventListener("keyup", ({
             key
         }) => {
             e.preventDefault();
 
             if (key === "Enter") {
-                if (text.value !== '') {
-                    item.innerText = text.value;
-                    deleteBtn.style.display = "inline-block";
-                    text.remove();
-                } else {
-                    text.remove();
-                    deleteBtn.style.display = "inline-block";
-                }
+                checkCheckbox();
             }
         });
     });
@@ -132,6 +139,7 @@ function changeItemListGUI(text, bool) {
         todos.splice(index, 1);
         listItem.remove();
         itemCount();
+
         if (todos.length === 0) {
             todoStatus.style.display = "none";
             main.removeAttribute('class', 'shadow-boxes');
@@ -165,8 +173,8 @@ let idCounter = 0;
 
 //Event listeners
 window.addEventListener('load', e => {
-    var data = localStorage.getItem("items");
-    var storage2 = JSON.parse(data);
+    let data = localStorage.getItem("items");
+    let storage2 = JSON.parse(data);
 
     storage2.forEach(e => {
         changeItemListGUI(e.text, e.checkbox);
@@ -189,7 +197,6 @@ form.onsubmit = (e => {
     e.preventDefault();
     if (textInput.value) {
         changeItemListGUI(textInput.value, false);
-
     }
 });
 
